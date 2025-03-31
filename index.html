@@ -1,0 +1,2255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="每日记账">
+    <title>每日记账系统</title>
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2IiBmaWxsPSJub25lIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImEiIHgxPSIwIiB5MT0iMCIgeDI9IjI1NiIgeTI9IjI1NiIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzAwN0FGRiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzAwNjZDQyIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiByeD0iNjQiIGZpbGw9InVybCgjYSkiLz48cGF0aCBkPSJNODIgMTEyYzAtMTEuMDUgOC45NS0yMCAyMC0yMGg1MmMxMS4wNSAwIDIwIDguOTUgMjAgMjB2NjRjMCAxMS4wNS04Ljk1IDIwLTIwIDIwSDEwMmMtMTEuMDUgMC0yMC04Ljk1LTIwLTIwdi02NHoiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMTIiLz48cGF0aCBkPSJNMTI4IDkwdjExMm0zMi01Ni1xMzIgMCIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIxMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+">
+    
+    <!-- Google Fonts (SF Pro approximation) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    
+    <!-- SheetJS -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-analytics-compat.js"></script>
+    
+    <style>
+        /* 基础样式 */
+        :root {
+            /* 苹果设计颜色 */
+            --blue: #007AFF;
+            --blue-dark: #0066CC;
+            --green: #34C759;
+            --red: #FF3B30;
+            --gray-1: #F2F2F7;
+            --gray-2: #E5E5EA;
+            --gray-3: #D1D1D6;
+            --gray-4: #C7C7CC;
+            --gray-5: #8E8E93;
+            --black: #000000;
+            --white: rgba(255, 255, 255, 0.95);
+            
+            /* 安全区域变量 */
+            --safe-area-inset-top: env(safe-area-inset-top, 0px);
+            --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-area-inset-left: env(safe-area-inset-left, 0px);
+            --safe-area-inset-right: env(safe-area-inset-right, 0px);
+            
+            /* 布局变量 */
+            --container-max-width: 600px;
+            --border-radius-sm: 12px;
+            --border-radius-md: 16px;
+            --border-radius-lg: 20px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background-color: var(--gray-1);
+            color: var(--black);
+            padding: calc(10px + var(--safe-area-inset-top)) calc(10px + var(--safe-area-inset-right)) calc(10px + var(--safe-area-inset-bottom)) calc(10px + var(--safe-area-inset-left));
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+        
+        /* 容器样式 */
+        .container {
+            width: 100%;
+            max-width: var(--container-max-width);
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background-color: var(--white);
+            border-radius: var(--border-radius-md);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--box-shadow);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        
+        /* 标题样式 */
+        h1, h2, h3 {
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            background: linear-gradient(to right, var(--blue), var(--blue-dark));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            padding: 10px 0;
+        }
+        
+        h2 {
+            font-size: 22px;
+        }
+        
+        h3 {
+            font-size: 18px;
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 20px;
+            border-radius: var(--border-radius-sm);
+            border: none;
+            font-weight: 500;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: white;
+            background: linear-gradient(to right, var(--blue), var(--blue-dark));
+            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+            outline: none;
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 6px rgba(0, 122, 255, 0.3);
+            filter: brightness(0.9);
+        }
+        
+        .btn-round {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            padding: 0;
+            font-size: 20px;
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--blue);
+            color: var(--blue);
+            box-shadow: none;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(to right, var(--red), #FF6059);
+            box-shadow: 0 2px 8px rgba(255, 59, 48, 0.3);
+        }
+        
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 16px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--gray-3);
+            font-size: 16px;
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+            outline: none;
+        }
+        
+        /* 加载动画 */
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(0, 122, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--blue);
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 主界面 */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        /* 日期选择器 */
+        .date-picker {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        
+        .date-display {
+            font-size: 18px;
+            font-weight: 600;
+            min-width: 140px;
+            text-align: center;
+        }
+        
+        /* 概览卡片 */
+        .overview-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .overview-card {
+            padding: 15px;
+            border-radius: var(--border-radius-sm);
+            text-align: center;
+            background-color: var(--white);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        
+        .overview-card h3 {
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: var(--gray-5);
+        }
+        
+        .overview-card .amount {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .income .amount {
+            color: var(--green);
+        }
+        
+        .expense .amount {
+            color: var(--red);
+        }
+        
+        .profit .amount {
+            color: var(--blue);
+        }
+        
+        /* 记录列表 */
+        .records-list {
+            margin-top: 20px;
+        }
+        
+        .record-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid var(--gray-2);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .record-type {
+            font-weight: 500;
+        }
+        
+        .record-amount {
+            font-weight: 600;
+        }
+        
+        .income-record .record-amount {
+            color: var(--green);
+        }
+        
+        .expense-record .record-amount {
+            color: var(--red);
+        }
+        
+        .delete-action {
+            position: absolute;
+            right: -80px;
+            top: 0;
+            bottom: 0;
+            width: 80px;
+            background-color: var(--red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+            transition: right 0.3s ease;
+        }
+        
+        .record-item.swiped {
+            transform: translateX(-80px);
+        }
+        
+        /* 浮动添加按钮 */
+        .add-record-btn {
+            position: fixed;
+            bottom: calc(20px + var(--safe-area-inset-bottom));
+            right: calc(20px + var(--safe-area-inset-right));
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(to bottom right, var(--blue), var(--blue-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 30px;
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+            z-index: 10;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .add-record-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 6px rgba(0, 122, 255, 0.3);
+        }
+        
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 100;
+            padding: 0 20px;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            background-color: var(--white);
+            border-radius: var(--border-radius-lg);
+            width: 100%;
+            max-width: 400px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            font-size: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--gray-5);
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        /* 类型选择器 */
+        .type-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .type-option {
+            padding: 10px 15px;
+            border-radius: var(--border-radius-sm);
+            background-color: var(--gray-2);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .type-option.selected {
+            background-color: var(--blue);
+            color: white;
+            box-shadow: 0 2px 6px rgba(0, 122, 255, 0.3);
+        }
+        
+        /* 详细数据 */
+        .stats-header {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .time-range-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .time-option {
+            padding: 8px 15px;
+            border-radius: var(--border-radius-sm);
+            background-color: var(--gray-2);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .time-option.selected {
+            background-color: var(--blue);
+            color: white;
+        }
+        
+        .chart-container {
+            height: 250px;
+            margin-bottom: 20px;
+        }
+        
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        /* 登录页面 */
+        .login-container {
+            max-width: 400px;
+            padding: 30px;
+            margin: 0 auto;
+        }
+        
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(to bottom right, var(--blue), var(--blue-dark));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+        }
+        
+        .auth-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        
+        .auth-link {
+            color: var(--blue);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        /* 适配手机端 */
+        @media (max-width: 480px) {
+            .overview-cards {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .form-control {
+                padding: 12px;
+            }
+            
+            .btn {
+                padding: 10px 16px;
+            }
+            
+            .modal-content {
+                padding: 20px;
+            }
+        }
+        
+        /* 苹果日历选择器 */
+        .calendar {
+            background-color: var(--white);
+            border-radius: var(--border-radius-lg);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            width: 100%;
+            max-width: 350px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .calendar-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        
+        .weekday {
+            text-align: center;
+            font-size: 12px;
+            color: var(--gray-5);
+            padding: 5px 0;
+        }
+        
+        .day {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .day:hover {
+            background-color: var(--gray-2);
+        }
+        
+        .day.selected {
+            background-color: var(--blue);
+            color: white;
+            font-weight: 500;
+            animation: pulse 1s infinite;
+        }
+        
+        .day.today {
+            border: 1px solid var(--blue);
+            font-weight: 500;
+        }
+        
+        .day.other-month {
+            color: var(--gray-4);
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.4); }
+            70% { box-shadow: 0 0 0 5px rgba(0, 122, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0); }
+        }
+        
+        /* 导出按钮 */
+        .export-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .export-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background-color: var(--white);
+            border: 1px solid var(--gray-3);
+            border-radius: var(--border-radius-sm);
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .export-dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: var(--white);
+            min-width: 160px;
+            border-radius: var(--border-radius-sm);
+            box-shadow: var(--box-shadow);
+            z-index: 1;
+            padding: 8px 0;
+            margin-top: 5px;
+        }
+        
+        .export-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .export-option:hover {
+            background-color: var(--gray-2);
+        }
+        
+        /* 提示框 */
+        .toast {
+            position: fixed;
+            bottom: calc(20px + var(--safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 20px;
+            border-radius: var(--border-radius-sm);
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        /* 警告框 */
+        .alert {
+            padding: 15px;
+            border-radius: var(--border-radius-sm);
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .alert-danger {
+            background-color: rgba(255, 59, 48, 0.1);
+            color: var(--red);
+            border: 1px solid rgba(255, 59, 48, 0.2);
+        }
+        
+        .alert-success {
+            background-color: rgba(52, 199, 89, 0.1);
+            color: var(--green);
+            border: 1px solid rgba(52, 199, 89, 0.2);
+        }
+        
+        /* 图表标题 */
+        .chart-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: var(--black);
+        }
+        
+        /* 显示/隐藏控制 */
+        .hidden {
+            display: none !important;
+        }
+        
+        .show {
+            display: flex !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录/注册界面 -->
+    <div id="authScreen" class="container">
+        <div class="card login-container">
+            <div class="login-logo">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3V21M17 8H7M20 16H4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <h1>每日记账</h1>
+            
+            <div id="loginForm">
+                <div class="form-group">
+                    <label for="email" class="form-label">邮箱</label>
+                    <input type="email" id="email" class="form-control" placeholder="请输入邮箱">
+                </div>
+                <div class="form-group">
+                    <label for="password" class="form-label">密码</label>
+                    <input type="password" id="password" class="form-control" placeholder="请输入密码">
+                </div>
+                <div id="authAlert" class="alert alert-danger hidden"></div>
+                <button id="loginBtn" class="btn btn-block">登录</button>
+                <div class="auth-links">
+                    <a id="registerLink" class="auth-link">注册账号</a>
+                    <a id="forgotPasswordLink" class="auth-link">忘记密码？</a>
+                </div>
+            </div>
+            
+            <div id="registerForm" class="hidden">
+                <div class="form-group">
+                    <label for="regEmail" class="form-label">邮箱</label>
+                    <input type="email" id="regEmail" class="form-control" placeholder="请输入邮箱">
+                </div>
+                <div class="form-group">
+                    <label for="regPassword" class="form-label">密码</label>
+                    <input type="password" id="regPassword" class="form-control" placeholder="请输入密码 (至少6位)">
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword" class="form-label">确认密码</label>
+                    <input type="password" id="confirmPassword" class="form-control" placeholder="再次输入密码">
+                </div>
+                <div id="regAlert" class="alert alert-danger hidden"></div>
+                <button id="registerBtn" class="btn btn-block">注册</button>
+                <div class="auth-links">
+                    <a id="loginLink" class="auth-link">返回登录</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 主界面 -->
+    <div id="mainScreen" class="container hidden">
+        <div class="header">
+            <button id="logoutBtn" class="btn-round btn-outline" title="退出">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15 4h4a2 2 0 012 2v12a2 2 0 01-2 2h-4M10 16l4-4-4-4M14 12H3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <h2>每日记账</h2>
+            <button id="statsBtn" class="btn-round btn-outline" title="详细数据">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 21H3M21 7V3h-4M3 17V3h12v4M12 21v-6M8 21v-4M16 21v-9M12 11V7M8 12v-5M4 7h8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="date-picker">
+            <button id="prevDayBtn" class="btn-round btn-outline">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <div id="currentDate" class="date-display">2023年10月1日</div>
+            <button id="nextDayBtn" class="btn-round btn-outline">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <button id="todayBtn" class="btn-round btn-outline" title="今天">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <button id="calendarBtn" class="btn-round btn-outline" title="日历">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="overview-cards">
+            <div class="overview-card income">
+                <h3>收入</h3>
+                <div id="dailyIncome" class="amount">¥0.00</div>
+            </div>
+            <div class="overview-card expense">
+                <h3>费用</h3>
+                <div id="dailyExpense" class="amount">¥0.00</div>
+            </div>
+            <div class="overview-card profit">
+                <h3>利润</h3>
+                <div id="dailyProfit" class="amount">¥0.00</div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="records-header">
+                <div class="export-dropdown">
+                    <button id="exportBtn" class="export-btn">
+                        导出
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div id="exportDropdown" class="export-dropdown-content">
+                        <div id="exportCSV" class="export-option">导出为 CSV</div>
+                        <div id="exportExcel" class="export-option">导出为 Excel</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="noRecords" class="hidden" style="text-align: center; padding: 20px; color: var(--gray-5);">
+                暂无记录，点击下方加号添加
+            </div>
+            
+            <div id="recordsList" class="records-list"></div>
+        </div>
+        
+        <div id="addRecordBtn" class="add-record-btn">+</div>
+    </div>
+    
+    <!-- 添加记录模态框 -->
+    <div id="addRecordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">添加记录</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="recordAmount" class="form-label">金额</label>
+                <input type="number" id="recordAmount" class="form-control" placeholder="请输入金额" step="0.01">
+            </div>
+            <div class="form-group">
+                <label class="form-label">类型</label>
+                <div id="recordTypeSelector" class="type-selector">
+                    <div class="type-option" data-category="income" data-type="吃喝岭师">吃喝岭师</div>
+                    <div class="type-option" data-category="income" data-type="24个半">24个半</div>
+                    <div class="type-option" data-category="income" data-type="个人预约">个人预约</div>
+                    <div class="type-option" data-category="expense" data-type="食材">食材</div>
+                    <div class="type-option" data-category="expense" data-type="交通">交通</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelAddRecord" class="btn btn-outline">取消</button>
+                <button id="saveRecord" class="btn">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 详细数据模态框 -->
+    <div id="statsModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title">详细数据</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            
+            <div class="time-range-selector">
+                <div class="time-option selected" data-days="7">最近7天</div>
+                <div class="time-option" data-days="30">最近30天</div>
+                <div class="time-option" data-days="90">最近90天</div>
+                <div class="time-option" data-days="current-month">本月</div>
+                <div class="time-option" data-days="custom">自定义</div>
+            </div>
+            
+            <div id="customDateRange" class="form-group hidden">
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label for="startDate" class="form-label">开始日期</label>
+                        <input type="date" id="startDate" class="form-control">
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="endDate" class="form-label">结束日期</label>
+                        <input type="date" id="endDate" class="form-control">
+                    </div>
+                </div>
+                <button id="applyCustomDate" class="btn" style="margin-top: 10px;">应用</button>
+            </div>
+            
+            <div class="overview-cards">
+                <div class="overview-card income">
+                    <h3>总收入</h3>
+                    <div id="totalIncome" class="amount">¥0.00</div>
+                </div>
+                <div class="overview-card expense">
+                    <h3>总费用</h3>
+                    <div id="totalExpense" class="amount">¥0.00</div>
+                </div>
+                <div class="overview-card profit">
+                    <h3>总利润</h3>
+                    <div id="totalProfit" class="amount">¥0.00</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <h3 class="chart-title">利润趋势</h3>
+                <div class="chart-container">
+                    <canvas id="profitChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <h3 class="chart-title">收入/费用趋势</h3>
+                <div class="chart-container">
+                    <canvas id="incomeExpenseChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <h3 class="chart-title">各类型收支比例</h3>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="records-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0;">记录列表</h3>
+                <div class="export-dropdown">
+                    <button id="exportStatsBtn" class="export-btn">
+                        导出
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div id="exportStatsDropdown" class="export-dropdown-content">
+                        <div id="exportStatsCSV" class="export-option">导出为 CSV</div>
+                        <div id="exportStatsExcel" class="export-option">导出为 Excel</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="statsRecordsList" class="records-list"></div>
+            
+            <div class="pagination">
+                <button id="prevPage" class="btn btn-outline">上一页</button>
+                <div id="pageInfo" style="margin: 0 10px; line-height: 40px;">第 <span id="currentPage">1</span> 页</div>
+                <button id="nextPage" class="btn btn-outline">下一页</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 日历模态框 -->
+    <div id="calendarModal" class="modal">
+        <div class="calendar">
+            <div class="calendar-header">
+                <div class="calendar-nav">
+                    <button id="prevMonthBtn" class="btn btn-outline btn-round">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <button id="nextMonthBtn" class="btn btn-outline btn-round">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+                <div id="calendarTitle" class="calendar-title">2023年10月</div>
+                <button id="closeCalendarBtn" class="btn btn-outline btn-round">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="calendar-grid">
+                <div class="weekday">日</div>
+                <div class="weekday">一</div>
+                <div class="weekday">二</div>
+                <div class="weekday">三</div>
+                <div class="weekday">四</div>
+                <div class="weekday">五</div>
+                <div class="weekday">六</div>
+                <!-- 日历天数将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 忘记密码模态框 -->
+    <div id="forgotPasswordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">重置密码</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="resetEmail" class="form-label">邮箱</label>
+                <input type="email" id="resetEmail" class="form-control" placeholder="请输入邮箱">
+            </div>
+            <div id="resetAlert" class="alert alert-danger hidden"></div>
+            <div class="modal-footer">
+                <button id="cancelReset" class="btn btn-outline">取消</button>
+                <button id="sendResetEmail" class="btn">发送重置邮件</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 提示框 -->
+    <div id="toast" class="toast"></div>
+    
+    <script>
+        // Firebase 配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyAR13kz2vTvXnAyfOH93kO2w0mf65huDII",
+            authDomain: "accounting-e8609.firebaseapp.com",
+            projectId: "accounting-e8609",
+            storageBucket: "accounting-e8609.firebasestorage.app",
+            messagingSenderId: "802516920170",
+            appId: "1:802516920170:web:f4ce114ae95ea2dc906713",
+            measurementId: "G-ZWBHX9BDM9"
+        };
+        
+        // 初始化 Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const analytics = firebase.analytics();
+        
+        // 全局变量
+        let currentUser = null;
+        let selectedDate = new Date();
+        let selectedRecordType = null;
+        let records = [];
+        let currentPage = 1;
+        const recordsPerPage = 10;
+        let timeRange = {
+            days: 7,
+            startDate: null,
+            endDate: null
+        };
+        
+        // DOM 元素
+        const authScreen = document.getElementById('authScreen');
+        const mainScreen = document.getElementById('mainScreen');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const registerLink = document.getElementById('registerLink');
+        const loginLink = document.getElementById('loginLink');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+        const authAlert = document.getElementById('authAlert');
+        const regAlert = document.getElementById('regAlert');
+        
+        // 主界面元素
+        const currentDateEl = document.getElementById('currentDate');
+        const prevDayBtn = document.getElementById('prevDayBtn');
+        const nextDayBtn = document.getElementById('nextDayBtn');
+        const todayBtn = document.getElementById('todayBtn');
+        const calendarBtn = document.getElementById('calendarBtn');
+        const dailyIncomeEl = document.getElementById('dailyIncome');
+        const dailyExpenseEl = document.getElementById('dailyExpense');
+        const dailyProfitEl = document.getElementById('dailyProfit');
+        const recordsList = document.getElementById('recordsList');
+        const noRecords = document.getElementById('noRecords');
+        const addRecordBtn = document.getElementById('addRecordBtn');
+        
+        // 模态框元素
+        const addRecordModal = document.getElementById('addRecordModal');
+        const recordAmount = document.getElementById('recordAmount');
+        const recordTypeSelector = document.getElementById('recordTypeSelector');
+        const saveRecord = document.getElementById('saveRecord');
+        const cancelAddRecord = document.getElementById('cancelAddRecord');
+        const statsBtn = document.getElementById('statsBtn');
+        const statsModal = document.getElementById('statsModal');
+        const timeRangeSelector = document.querySelector('.time-range-selector');
+        const customDateRange = document.getElementById('customDateRange');
+        const startDate = document.getElementById('startDate');
+        const endDate = document.getElementById('endDate');
+        const applyCustomDate = document.getElementById('applyCustomDate');
+        const totalIncomeEl = document.getElementById('totalIncome');
+        const totalExpenseEl = document.getElementById('totalExpense');
+        const totalProfitEl = document.getElementById('totalProfit');
+        const statsRecordsList = document.getElementById('statsRecordsList');
+        const prevPage = document.getElementById('prevPage');
+        const nextPage = document.getElementById('nextPage');
+        const currentPageEl = document.getElementById('currentPage');
+        const calendarModal = document.getElementById('calendarModal');
+        const calendarTitle = document.getElementById('calendarTitle');
+        const prevMonthBtn = document.getElementById('prevMonthBtn');
+        const nextMonthBtn = document.getElementById('nextMonthBtn');
+        const closeCalendarBtn = document.getElementById('closeCalendarBtn');
+        const calendarGrid = document.querySelector('.calendar-grid');
+        const forgotPasswordModal = document.getElementById('forgotPasswordModal');
+        const resetEmail = document.getElementById('resetEmail');
+        const sendResetEmail = document.getElementById('sendResetEmail');
+        const cancelReset = document.getElementById('cancelReset');
+        const resetAlert = document.getElementById('resetAlert');
+        const toast = document.getElementById('toast');
+        
+        // 导出按钮
+        const exportBtn = document.getElementById('exportBtn');
+        const exportDropdown = document.getElementById('exportDropdown');
+        const exportCSV = document.getElementById('exportCSV');
+        const exportExcel = document.getElementById('exportExcel');
+        const exportStatsBtn = document.getElementById('exportStatsBtn');
+        const exportStatsDropdown = document.getElementById('exportStatsDropdown');
+        const exportStatsCSV = document.getElementById('exportStatsCSV');
+        const exportStatsExcel = document.getElementById('exportStatsExcel');
+        
+        // 工具函数
+        const formatCurrency = (amount) => {
+            return '¥' + parseFloat(amount).toFixed(2);
+        };
+        
+        const formatDate = (date) => {
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            return `${year}年${month}月${day}日`;
+        };
+        
+        const formatDateForDB = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+        
+        const showToast = (message, duration = 3000) => {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        };
+        
+        const showAlert = (element, message, type = 'danger') => {
+            element.textContent = message;
+            element.className = `alert alert-${type}`;
+            element.classList.remove('hidden');
+        };
+        
+        const hideAlert = (element) => {
+            element.classList.add('hidden');
+        };
+        
+        // 认证相关函数
+        const registerUser = async (email, password, confirmPassword) => {
+            hideAlert(regAlert);
+            
+            if (!email || !password) {
+                showAlert(regAlert, '邮箱和密码不能为空');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showAlert(regAlert, '两次输入的密码不一致');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showAlert(regAlert, '密码至少需要6个字符');
+                return;
+            }
+            
+            try {
+                await auth.createUserWithEmailAndPassword(email, password);
+                showToast('注册成功！');
+                toggleAuthForms();
+            } catch (error) {
+                let errorMessage = '注册失败，请稍后再试';
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = '该邮箱已被注册';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = '邮箱格式不正确';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = '密码强度太弱';
+                }
+                showAlert(regAlert, errorMessage);
+            }
+        };
+        
+        const loginUser = async (email, password) => {
+            hideAlert(authAlert);
+            
+            if (!email || !password) {
+                showAlert(authAlert, '邮箱和密码不能为空');
+                return;
+            }
+            
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                showToast('登录成功！');
+            } catch (error) {
+                let errorMessage = '登录失败，请稍后再试';
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    errorMessage = '邮箱或密码错误';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = '邮箱格式不正确';
+                } else if (error.code === 'auth/too-many-requests') {
+                    errorMessage = '登录尝试次数过多，请稍后再试';
+                }
+                showAlert(authAlert, errorMessage);
+            }
+        };
+        
+        const resetPassword = async (email) => {
+            hideAlert(resetAlert);
+            
+            if (!email) {
+                showAlert(resetAlert, '请输入邮箱地址');
+                return;
+            }
+            
+            try {
+                await auth.sendPasswordResetEmail(email);
+                showToast('重置密码邮件已发送');
+                closeModal(forgotPasswordModal);
+            } catch (error) {
+                let errorMessage = '发送重置邮件失败';
+                if (error.code === 'auth/user-not-found') {
+                    errorMessage = '该邮箱未注册';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = '邮箱格式不正确';
+                }
+                showAlert(resetAlert, errorMessage);
+            }
+        };
+        
+        const logoutUser = async () => {
+            try {
+                await auth.signOut();
+                showToast('已退出登录');
+            } catch (error) {
+                showToast('退出登录失败');
+                console.error('退出登录失败', error);
+            }
+        };
+        
+        // 切换登录/注册表单
+        const toggleAuthForms = () => {
+            loginForm.classList.toggle('hidden');
+            registerForm.classList.toggle('hidden');
+        };
+        
+        // 显示/隐藏模态框
+        const openModal = (modal) => {
+            modal.classList.add('show');
+        };
+        
+        const closeModal = (modal) => {
+            modal.classList.remove('show');
+        };
+        
+        // 监听认证状态变化
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                authScreen.classList.add('hidden');
+                mainScreen.classList.remove('hidden');
+                loadDailyRecords();
+            } else {
+                currentUser = null;
+                authScreen.classList.remove('hidden');
+                mainScreen.classList.add('hidden');
+                // 清空表单
+                document.getElementById('email').value = '';
+                document.getElementById('password').value = '';
+                document.getElementById('regEmail').value = '';
+                document.getElementById('regPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+                hideAlert(authAlert);
+                hideAlert(regAlert);
+            }
+        });
+        
+        // 注册事件监听
+        registerLink.addEventListener('click', toggleAuthForms);
+        loginLink.addEventListener('click', toggleAuthForms);
+        
+        loginBtn.addEventListener('click', () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            loginUser(email, password);
+        });
+        
+        registerBtn.addEventListener('click', () => {
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            registerUser(email, password, confirmPassword);
+        });
+        
+        logoutBtn.addEventListener('click', logoutUser);
+        
+        forgotPasswordLink.addEventListener('click', () => {
+            openModal(forgotPasswordModal);
+            resetEmail.value = document.getElementById('email').value;
+        });
+        
+        sendResetEmail.addEventListener('click', () => {
+            resetPassword(resetEmail.value);
+        });
+        
+        cancelReset.addEventListener('click', () => {
+            closeModal(forgotPasswordModal);
+        });
+        
+        // 关闭模态框
+        document.querySelectorAll('.modal-close').forEach(closeBtn => {
+            closeBtn.addEventListener('click', () => {
+                const modal = closeBtn.closest('.modal');
+                closeModal(modal);
+            });
+        });
+        
+        // 点击模态框外部关闭
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal(modal);
+                }
+            });
+        });
+        
+        // 记录管理相关函数
+        const loadDailyRecords = async () => {
+            if (!currentUser) return;
+            
+            const dateString = formatDateForDB(selectedDate);
+            try {
+                const snapshot = await db.collection('users')
+                    .doc(currentUser.uid)
+                    .collection('records')
+                    .where('date', '==', dateString)
+                    .orderBy('timestamp', 'desc')
+                    .get();
+                
+                records = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                
+                updateDailyStats();
+                renderRecords();
+            } catch (error) {
+                console.error('加载记录失败', error);
+                showToast('加载记录失败，请检查网络连接');
+            }
+        };
+        
+        const updateDailyStats = () => {
+            let income = 0;
+            let expense = 0;
+            
+            records.forEach(record => {
+                if (record.category === 'income') {
+                    income += parseFloat(record.amount);
+                } else {
+                    expense += parseFloat(record.amount);
+                }
+            });
+            
+            const profit = income - expense;
+            
+            dailyIncomeEl.textContent = formatCurrency(income);
+            dailyExpenseEl.textContent = formatCurrency(expense);
+            dailyProfitEl.textContent = formatCurrency(profit);
+        };
+        
+        const renderRecords = () => {
+            recordsList.innerHTML = '';
+            
+            if (records.length === 0) {
+                noRecords.classList.remove('hidden');
+                return;
+            }
+            
+            noRecords.classList.add('hidden');
+            
+            records.forEach(record => {
+                const recordItem = document.createElement('div');
+                recordItem.className = `record-item ${record.category}-record`;
+                recordItem.setAttribute('data-id', record.id);
+                
+                recordItem.innerHTML = `
+                    <div class="record-type">${record.type}</div>
+                    <div class="record-amount">${formatCurrency(record.amount)}</div>
+                    <div class="delete-action">删除</div>
+                `;
+                
+                recordsList.appendChild(recordItem);
+                
+                // 添加滑动删除事件
+                let startX = 0;
+                let isDragging = false;
+                
+                recordItem.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                    isDragging = true;
+                });
+                
+                recordItem.addEventListener('touchmove', (e) => {
+                    if (!isDragging) return;
+                    
+                    const currentX = e.touches[0].clientX;
+                    const diff = startX - currentX;
+                    
+                    if (diff > 50) {
+                        recordItem.classList.add('swiped');
+                    } else {
+                        recordItem.classList.remove('swiped');
+                    }
+                });
+                
+                recordItem.addEventListener('touchend', () => {
+                    isDragging = false;
+                });
+                
+                // 点击删除按钮
+                const deleteAction = recordItem.querySelector('.delete-action');
+                deleteAction.addEventListener('click', () => {
+                    deleteRecord(record.id);
+                });
+            });
+        };
+        
+        const addRecord = async () => {
+            if (!currentUser || !selectedRecordType) {
+                showToast('请选择记录类型');
+                return;
+            }
+            
+            const amount = parseFloat(recordAmount.value);
+            if (isNaN(amount) || amount <= 0) {
+                showToast('请输入有效金额');
+                return;
+            }
+            
+            const record = {
+                amount,
+                type: selectedRecordType.type,
+                category: selectedRecordType.category,
+                date: formatDateForDB(selectedDate),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            try {
+                await db.collection('users')
+                    .doc(currentUser.uid)
+                    .collection('records')
+                    .add(record);
+                
+                showToast('记录添加成功');
+                closeModal(addRecordModal);
+                
+                // 重置表单
+                recordAmount.value = '';
+                selectedRecordType = null;
+                document.querySelectorAll('.type-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                
+                loadDailyRecords();
+            } catch (error) {
+                console.error('添加记录失败', error);
+                showToast('添加记录失败，请检查网络连接');
+            }
+        };
+        
+        const deleteRecord = async (recordId) => {
+            if (!currentUser || !recordId) return;
+            
+            try {
+                await db.collection('users')
+                    .doc(currentUser.uid)
+                    .collection('records')
+                    .doc(recordId)
+                    .delete();
+                
+                showToast('记录已删除');
+                loadDailyRecords();
+            } catch (error) {
+                console.error('删除记录失败', error);
+                showToast('删除记录失败，请检查网络连接');
+            }
+        };
+        
+        // 日期相关函数
+        const updateDateDisplay = () => {
+            currentDateEl.textContent = formatDate(selectedDate);
+        };
+        
+        const changeDate = (days) => {
+            const newDate = new Date(selectedDate);
+            newDate.setDate(newDate.getDate() + days);
+            selectedDate = newDate;
+            updateDateDisplay();
+            loadDailyRecords();
+        };
+        
+        const goToToday = () => {
+            selectedDate = new Date();
+            updateDateDisplay();
+            loadDailyRecords();
+        };
+        
+        // 日历相关函数
+        const renderCalendar = () => {
+            const year = selectedDate.getFullYear();
+            const month = selectedDate.getMonth();
+            
+            calendarTitle.textContent = `${year}年${month + 1}月`;
+            
+            // 清除之前的日期
+            const days = calendarGrid.querySelectorAll('.day');
+            days.forEach(day => {
+                if (!day.classList.contains('weekday')) {
+                    day.remove();
+                }
+            });
+            
+            // 获取当月第一天和最后一天
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            
+            // 获取当月第一天是星期几
+            const firstDayIndex = firstDay.getDay();
+            
+            // 添加上个月的日期
+            const prevMonthLastDay = new Date(year, month, 0).getDate();
+            for (let i = firstDayIndex - 1; i >= 0; i--) {
+                const day = document.createElement('div');
+                day.className = 'day other-month';
+                day.textContent = prevMonthLastDay - i;
+                calendarGrid.appendChild(day);
+            }
+            
+            // 添加当月的日期
+            const today = new Date();
+            for (let i = 1; i <= lastDay.getDate(); i++) {
+                const day = document.createElement('div');
+                day.className = 'day';
+                day.textContent = i;
+                day.setAttribute('data-date', `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`);
+                
+                // 判断是否是当天
+                if (
+                    year === today.getFullYear() &&
+                    month === today.getMonth() &&
+                    i === today.getDate()
+                ) {
+                    day.classList.add('today');
+                }
+                
+                // 判断是否是选中的日期
+                if (
+                    year === selectedDate.getFullYear() &&
+                    month === selectedDate.getMonth() &&
+                    i === selectedDate.getDate()
+                ) {
+                    day.classList.add('selected');
+                }
+                
+                // 添加点击事件
+                day.addEventListener('click', () => {
+                    selectedDate = new Date(year, month, i);
+                    closeModal(calendarModal);
+                    updateDateDisplay();
+                    loadDailyRecords();
+                });
+                
+                calendarGrid.appendChild(day);
+            }
+            
+            // 添加下个月的日期
+            const daysAfter = 42 - (firstDayIndex + lastDay.getDate());
+            for (let i = 1; i <= daysAfter; i++) {
+                const day = document.createElement('div');
+                day.className = 'day other-month';
+                day.textContent = i;
+                calendarGrid.appendChild(day);
+            }
+        };
+        
+        const changeMonth = (months) => {
+            const newDate = new Date(selectedDate);
+            newDate.setMonth(newDate.getMonth() + months);
+            selectedDate = newDate;
+            renderCalendar();
+        };
+        
+        // 主界面事件监听
+        addRecordBtn.addEventListener('click', () => {
+            openModal(addRecordModal);
+            recordAmount.value = '';
+            selectedRecordType = null;
+            document.querySelectorAll('.type-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+        });
+        
+        cancelAddRecord.addEventListener('click', () => {
+            closeModal(addRecordModal);
+        });
+        
+        recordTypeSelector.addEventListener('click', (e) => {
+            if (e.target.classList.contains('type-option')) {
+                document.querySelectorAll('.type-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                
+                e.target.classList.add('selected');
+                selectedRecordType = {
+                    type: e.target.getAttribute('data-type'),
+                    category: e.target.getAttribute('data-category')
+                };
+            }
+        });
+        
+        saveRecord.addEventListener('click', addRecord);
+        
+        prevDayBtn.addEventListener('click', () => changeDate(-1));
+        nextDayBtn.addEventListener('click', () => changeDate(1));
+        todayBtn.addEventListener('click', goToToday);
+        
+        calendarBtn.addEventListener('click', () => {
+            renderCalendar();
+            openModal(calendarModal);
+        });
+        
+        prevMonthBtn.addEventListener('click', () => changeMonth(-1));
+        nextMonthBtn.addEventListener('click', () => changeMonth(1));
+        closeCalendarBtn.addEventListener('click', () => closeModal(calendarModal));
+        
+        // 初始化日期显示
+        updateDateDisplay();
+        
+        // 详细数据相关函数
+        const loadStatsRecords = async () => {
+            if (!currentUser) return;
+            
+            let query = db.collection('users').doc(currentUser.uid).collection('records');
+            
+            // 根据时间范围过滤
+            if (timeRange.startDate && timeRange.endDate) {
+                query = query.where('date', '>=', timeRange.startDate)
+                              .where('date', '<=', timeRange.endDate);
+            } else if (timeRange.days === 'current-month') {
+                const now = new Date();
+                const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+                const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                
+                const firstDayString = formatDateForDB(firstDay);
+                const lastDayString = formatDateForDB(lastDay);
+                
+                query = query.where('date', '>=', firstDayString)
+                            .where('date', '<=', lastDayString);
+            } else {
+                const now = new Date();
+                const pastDate = new Date();
+                pastDate.setDate(now.getDate() - timeRange.days);
+                
+                const pastDateString = formatDateForDB(pastDate);
+                const nowString = formatDateForDB(now);
+                
+                query = query.where('date', '>=', pastDateString)
+                            .where('date', '<=', nowString);
+            }
+            
+            try {
+                const snapshot = await query.orderBy('date', 'desc').get();
+                
+                records = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                
+                updateTotalStats();
+                renderStatsRecords();
+                updateCharts();
+            } catch (error) {
+                console.error('加载统计数据失败', error);
+                showToast('加载统计数据失败，请检查网络连接');
+            }
+        };
+        
+        const updateTotalStats = () => {
+            let income = 0;
+            let expense = 0;
+            
+            records.forEach(record => {
+                if (record.category === 'income') {
+                    income += parseFloat(record.amount);
+                } else {
+                    expense += parseFloat(record.amount);
+                }
+            });
+            
+            const profit = income - expense;
+            
+            totalIncomeEl.textContent = formatCurrency(income);
+            totalExpenseEl.textContent = formatCurrency(expense);
+            totalProfitEl.textContent = formatCurrency(profit);
+        };
+        
+        const renderStatsRecords = () => {
+            statsRecordsList.innerHTML = '';
+            
+            const start = (currentPage - 1) * recordsPerPage;
+            const end = start + recordsPerPage;
+            const paginatedRecords = records.slice(start, end);
+            
+            if (paginatedRecords.length === 0) {
+                statsRecordsList.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--gray-5);">暂无记录</div>';
+                prevPage.disabled = true;
+                nextPage.disabled = true;
+                return;
+            }
+            
+            paginatedRecords.forEach(record => {
+                const recordItem = document.createElement('div');
+                recordItem.className = `record-item ${record.category}-record`;
+                
+                // 将日期从YYYY-MM-DD转换为易读格式
+                const [year, month, day] = record.date.split('-');
+                const formattedDate = `${month}/${day}`;
+                
+                recordItem.innerHTML = `
+                    <div style="display: flex; align-items: center;">
+                        <div style="margin-right: 10px; color: var(--gray-5);">${formattedDate}</div>
+                        <div class="record-type">${record.type}</div>
+                    </div>
+                    <div class="record-amount">${formatCurrency(record.amount)}</div>
+                `;
+                
+                statsRecordsList.appendChild(recordItem);
+            });
+            
+            // 更新分页按钮状态
+            prevPage.disabled = currentPage === 1;
+            nextPage.disabled = end >= records.length;
+            
+            // 更新当前页码
+            currentPageEl.textContent = currentPage;
+        };
+        
+        // 图表相关函数
+        const updateCharts = () => {
+            updateProfitChart();
+            updateIncomeExpenseChart();
+            updateCategoryChart();
+        };
+        
+        const updateProfitChart = () => {
+            // 按日期分组计算每日利润
+            const profitByDate = {};
+            
+            records.forEach(record => {
+                if (!profitByDate[record.date]) {
+                    profitByDate[record.date] = {
+                        income: 0,
+                        expense: 0
+                    };
+                }
+                
+                if (record.category === 'income') {
+                    profitByDate[record.date].income += parseFloat(record.amount);
+                } else {
+                    profitByDate[record.date].expense += parseFloat(record.amount);
+                }
+            });
+            
+            // 转换为数组并按日期排序
+            const sortedDates = Object.keys(profitByDate).sort();
+            
+            // 限制为最多10个数据点
+            const limitedDates = sortedDates.length > 10 ? sortedDates.slice(-10) : sortedDates;
+            
+            const labels = limitedDates.map(date => {
+                const [_, month, day] = date.split('-');
+                return `${month}/${day}`;
+            });
+            
+            const profits = limitedDates.map(date => {
+                const { income, expense } = profitByDate[date];
+                return income - expense;
+            });
+            
+            // 销毁旧图表
+            if (window.profitChartInstance) {
+                window.profitChartInstance.destroy();
+            }
+            
+            // 创建新图表
+            const ctx = document.getElementById('profitChart').getContext('2d');
+            window.profitChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: '利润',
+                        data: profits,
+                        borderColor: '#007AFF',
+                        backgroundColor: 'rgba(0, 122, 255, 0.1)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                }
+            });
+        };
+        
+        const updateIncomeExpenseChart = () => {
+            // 按日期分组计算每日收入和支出
+            const dataByDate = {};
+            
+            records.forEach(record => {
+                if (!dataByDate[record.date]) {
+                    dataByDate[record.date] = {
+                        income: 0,
+                        expense: 0
+                    };
+                }
+                
+                if (record.category === 'income') {
+                    dataByDate[record.date].income += parseFloat(record.amount);
+                } else {
+                    dataByDate[record.date].expense += parseFloat(record.amount);
+                }
+            });
+            
+            // 转换为数组并按日期排序
+            const sortedDates = Object.keys(dataByDate).sort();
+            
+            // 限制为最多10个数据点
+            const limitedDates = sortedDates.length > 10 ? sortedDates.slice(-10) : sortedDates;
+            
+            const labels = limitedDates.map(date => {
+                const [_, month, day] = date.split('-');
+                return `${month}/${day}`;
+            });
+            
+            const incomes = limitedDates.map(date => dataByDate[date].income);
+            const expenses = limitedDates.map(date => dataByDate[date].expense);
+            
+            // 销毁旧图表
+            if (window.incomeExpenseChartInstance) {
+                window.incomeExpenseChartInstance.destroy();
+            }
+            
+            // 创建新图表
+            const ctx = document.getElementById('incomeExpenseChart').getContext('2d');
+            window.incomeExpenseChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: '收入',
+                            data: incomes,
+                            borderColor: '#34C759',
+                            backgroundColor: 'rgba(52, 199, 89, 0.1)',
+                            tension: 0.1,
+                            fill: true
+                        },
+                        {
+                            label: '费用',
+                            data: expenses,
+                            borderColor: '#FF3B30',
+                            backgroundColor: 'rgba(255, 59, 48, 0.1)',
+                            tension: 0.1,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                boxWidth: 8
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                }
+            });
+        };
+        
+        const updateCategoryChart = () => {
+            // 按类型分组计算总额
+            const categoryData = {};
+            
+            records.forEach(record => {
+                if (!categoryData[record.type]) {
+                    categoryData[record.type] = {
+                        amount: 0,
+                        category: record.category
+                    };
+                }
+                
+                categoryData[record.type].amount += parseFloat(record.amount);
+            });
+            
+            // 转换为数组
+            const categories = Object.keys(categoryData);
+            const amounts = categories.map(type => categoryData[type].amount);
+            const backgroundColors = categories.map(type => 
+                categoryData[type].category === 'income' ? 'rgba(52, 199, 89, 0.7)' : 'rgba(255, 59, 48, 0.7)'
+            );
+            const borderColors = categories.map(type => 
+                categoryData[type].category === 'income' ? '#34C759' : '#FF3B30'
+            );
+            
+            // 销毁旧图表
+            if (window.categoryChartInstance) {
+                window.categoryChartInstance.destroy();
+            }
+            
+            // 创建新图表
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            window.categoryChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        data: amounts,
+                        backgroundColor: backgroundColors,
+                        borderColor: borderColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                usePointStyle: true,
+                                boxWidth: 8,
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        };
+        
+        // 导出相关函数
+        const exportRecords = (format, source = 'daily') => {
+            if (!currentUser) return;
+            
+            let recordsToExport = [];
+            if (source === 'daily') {
+                recordsToExport = records;
+            } else {
+                recordsToExport = records;
+            }
+            
+            if (recordsToExport.length === 0) {
+                showToast('暂无记录可导出');
+                return;
+            }
+            
+            // 准备导出数据
+            const exportData = recordsToExport.map(record => ({
+                日期: record.date,
+                类型: record.type,
+                类别: record.category === 'income' ? '收入' : '费用',
+                金额: record.amount
+            }));
+            
+            // 根据格式导出
+            if (format === 'csv') {
+                exportToCSV(exportData);
+            } else if (format === 'excel') {
+                exportToExcel(exportData);
+            }
+        };
+        
+        const exportToCSV = (data) => {
+            // 提取表头
+            const headers = Object.keys(data[0]);
+            
+            // 创建CSV内容
+            let csvContent = headers.join(',') + '\r\n';
+            
+            // 添加数据行
+            data.forEach(item => {
+                const row = headers.map(header => item[header]).join(',');
+                csvContent += row + '\r\n';
+            });
+            
+            // 创建Blob
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            
+            // 创建下载链接
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `记账记录_${formatDateForDB(new Date())}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+        
+        const exportToExcel = (data) => {
+            // 创建工作簿
+            const wb = XLSX.utils.book_new();
+            
+            // 创建工作表
+            const ws = XLSX.utils.json_to_sheet(data);
+            
+            // 将工作表添加到工作簿
+            XLSX.utils.book_append_sheet(wb, ws, '记账记录');
+            
+            // 导出工作簿
+            XLSX.writeFile(wb, `记账记录_${formatDateForDB(new Date())}.xlsx`);
+        };
+        
+        // 详细数据事件监听
+        statsBtn.addEventListener('click', () => {
+            currentPage = 1;
+            timeRange = { days: 7, startDate: null, endDate: null };
+            
+            // 重置时间范围选择
+            document.querySelectorAll('.time-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.querySelector('.time-option[data-days="7"]').classList.add('selected');
+            
+            customDateRange.classList.add('hidden');
+            loadStatsRecords();
+            openModal(statsModal);
+        });
+        
+        timeRangeSelector.addEventListener('click', (e) => {
+            if (e.target.classList.contains('time-option')) {
+                document.querySelectorAll('.time-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                
+                e.target.classList.add('selected');
+                const days = e.target.getAttribute('data-days');
+                
+                if (days === 'custom') {
+                    customDateRange.classList.remove('hidden');
+                    // 设置默认日期范围（最近30天）
+                    const today = new Date();
+                    const thirtyDaysAgo = new Date();
+                    thirtyDaysAgo.setDate(today.getDate() - 30);
+                    
+                    startDate.value = formatDateForDB(thirtyDaysAgo);
+                    endDate.value = formatDateForDB(today);
+                } else {
+                    customDateRange.classList.add('hidden');
+                    timeRange = {
+                        days: days,
+                        startDate: null,
+                        endDate: null
+                    };
+                    currentPage = 1;
+                    loadStatsRecords();
+                }
+            }
+        });
+        
+        applyCustomDate.addEventListener('click', () => {
+            const start = startDate.value;
+            const end = endDate.value;
+            
+            if (!start || !end) {
+                showToast('请选择开始和结束日期');
+                return;
+            }
+            
+            if (new Date(start) > new Date(end)) {
+                showToast('开始日期不能晚于结束日期');
+                return;
+            }
+            
+            timeRange = {
+                days: null,
+                startDate: start,
+                endDate: end
+            };
+            
+            currentPage = 1;
+            loadStatsRecords();
+        });
+        
+        prevPage.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderStatsRecords();
+            }
+        });
+        
+        nextPage.addEventListener('click', () => {
+            if ((currentPage * recordsPerPage) < records.length) {
+                currentPage++;
+                renderStatsRecords();
+            }
+        });
+        
+        // 导出按钮事件监听
+        exportBtn.addEventListener('click', () => {
+            exportDropdown.style.display = exportDropdown.style.display === 'block' ? 'none' : 'block';
+        });
+        
+        exportCSV.addEventListener('click', () => {
+            exportRecords('csv', 'daily');
+            exportDropdown.style.display = 'none';
+        });
+        
+        exportExcel.addEventListener('click', () => {
+            exportRecords('excel', 'daily');
+            exportDropdown.style.display = 'none';
+        });
+        
+        exportStatsBtn.addEventListener('click', () => {
+            exportStatsDropdown.style.display = exportStatsDropdown.style.display === 'block' ? 'none' : 'block';
+        });
+        
+        exportStatsCSV.addEventListener('click', () => {
+            exportRecords('csv', 'stats');
+            exportStatsDropdown.style.display = 'none';
+        });
+        
+        exportStatsExcel.addEventListener('click', () => {
+            exportRecords('excel', 'stats');
+            exportStatsDropdown.style.display = 'none';
+        });
+        
+        // 点击其他地方关闭导出下拉菜单
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.export-dropdown')) {
+                exportDropdown.style.display = 'none';
+                exportStatsDropdown.style.display = 'none';
+            }
+        });
+        
+        // 回车键登录
+        document.getElementById('password').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                loginBtn.click();
+            }
+        });
+        
+        // 添加键盘支持
+        document.addEventListener('keydown', (e) => {
+            // ESC键关闭模态框
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal.show').forEach(modal => {
+                    closeModal(modal);
+                });
+            }
+        });
+        
+        // 添加PWA支持
+        // 检测是否有网络
+        window.addEventListener('online', () => {
+            document.body.classList.remove('offline');
+            showToast('已恢复网络连接');
+        });
+        
+        window.addEventListener('offline', () => {
+            document.body.classList.add('offline');
+            showToast('网络连接已断开，部分功能可能不可用');
+        });
+        
+        // 添加到主屏幕提示
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // 阻止Chrome 67及更早版本自动显示安装提示
+            e.preventDefault();
+            // 保存事件，以便稍后触发
+            deferredPrompt = e;
+        });
+    </script>
+</body>
+</html> 
