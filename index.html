@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>每日记账系统</title>
+    
+    <!-- PWA基本配置 -->
+    <meta name="theme-color" content="#f2f2f7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="记账系统">
+    <meta name="description" content="一个简单易用的每日记账系统">
+    
+    <!-- 图标 -->
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAB7ElEQVR4nO2ZvU7CUBTHi4kvcMGYOLM7Po87MxGfQR18AQcHYhQTRwcHB0cTE2NMjHxFaWkL9ONe0hOaXg5t6b23aaL3l5ykaXPP+Z3Te09bwphjHcUBZULDDSgTGA4oExjOABZQFE64FXl3K9xKeAW3gs8SrtBYFu5WbBVd5FGCrNa8EtUfz0LHOqDElnDFNHKvQk/iMGqR/O4Lbd9/uFW6HFBSs8LJbK9JgzOX9LZ1NMt5J8Xj/AjnJzOVpwTntBYvJgD8cLx2p0tOx0xVcOYmnM8KJ55X4JMNw5OVQKcCe3q32/Q5k+Dlz+LuZwTEhR+cTE5/N/bGbzw2a+X7jwuA5g2rp3dgPBVhJSC/QQmAxgcXLZ4rHxuApgNJPjkArQPSfDIA2g5I8dIAtB2Q5qUAWDugxCcCYO2AEp8YgJUDynxiAFYOKPOJAWg7oMUnAqDtgCafGICWA9p8YgAaDrLgEwNQdZAVnxiAioPM+cQAZAfS+dV3x9kPILxI/hfXAV4tLgHEFzkVB3jRuASQ7/+SEZB0g3EBQL7/SgYg6RZnHYB8/5MMQJINzioA+f4rGQDsQPGLrHCyy1YANXy1upPDWkBd9JFHCbJa80qMCpY/cUrkUUKEh7zEMeNXfgEvMIwGACgJkwAAAABJRU5ErkJggg==">
+    <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAB7ElEQVR4nO2ZvU7CUBTHi4kvcMGYOLM7Po87MxGfQR18AQcHYhQTRwcHB0cTE2NMjHxFaWkL9ONe0hOaXg5t6b23aaL3l5ykaXPP+Z3Te09bwphjHcUBZULDDSgTGA4oExjOABZQFE64FXl3K9xKeAW3gs8SrtBYFu5WbBVd5FGCrNa8EtUfz0LHOqDElnDFNHKvQk/iMGqR/O4Lbd9/uFW6HFBSs8LJbK9JgzOX9LZ1NMt5J8Xj/AjnJzOVpwTntBYvJgD8cLx2p0tOx0xVcOYmnM8KJ55X4JMNw5OVQKcCe3q32/Q5k+Dlz+LuZwTEhR+cTE5/N/bGbzw2a+X7jwuA5g2rp3dgPBVhJSC/QQmAxgcXLZ4rHxuApgNJPjkArQPSfDIA2g5I8dIAtB2Q5qUAWDugxCcCYO2AEp8YgJUDynxiAFYOKPOJAWg7oMUnAqDtgCafGICWA9p8YgAaDrLgEwNQdZAVnxiAioPM+cQAZAfS+dV3x9kPILxI/hfXAV4tLgHEFzkVB3jRuASQ7/+SEZB0g3EBQL7/SgYg6RZnHYB8/5MMQJINzioA+f4rGQDsQPGLrHCyy1YANXy1upPDWkBd9JFHCbJa80qMCpY/cUrkUUKEh7zEMeNXfgEvMIwGACgJkwAAAABJRU5ErkJggg==">
+    
+    <!-- iOS上的启动图像 -->
+    <link rel="apple-touch-startup-image" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAB7ElEQVR4nO2ZvU7CUBTHi4kvcMGYOLM7Po87MxGfQR18AQcHYhQTRwcHB0cTE2NMjHxFaWkL9ONe0hOaXg5t6b23aaL3l5ykaXPP+Z3Te09bwphjHcUBZULDDSgTGA4oExjOABZQFE64FXl3K9xKeAW3gs8SrtBYFu5WbBVd5FGCrNa8EtUfz0LHOqDElnDFNHKvQk/iMGqR/O4Lbd9/uFW6HFBSs8LJbK9JgzOX9LZ1NMt5J8Xj/AjnJzOVpwTntBYvJgD8cLx2p0tOx0xVcOYmnM8KJ55X4JMNw5OVQKcCe3q32/Q5k+Dlz+LuZwTEhR+cTE5/N/bGbzw2a+X7jwuA5g2rp3dgPBVhJSC/QQmAxgcXLZ4rHxuApgNJPjkArQPSfDIA2g5I8dIAtB2Q5qUAWDugxCcCYO2AEp8YgJUDynxiAFYOKPOJAWg7oMUnAqDtgCafGICWA9p8YgAaDrLgEwNQdZAVnxiAioPM+cQAZAfS+dV3x9kPILxI/hfXAV4tLgHEFzkVB3jRuASQ7/+SEZB0g3EBQL7/SgYg6RZnHYB8/5MMQJINzioA+f4rGQDsQPGLrHCyy1YANXy1upPDWkBd9JFHCbJa80qMCpY/cUrkUUKEh7zEMeNXfgEvMIwGACgJkwAAAABJRU5ErkJggg==" media="all">
+    
+    <!-- PWA清单文件 - 直接内嵌JSON -->
+    <script type="application/json" id="pwa-manifest">
+    {
+      "name": "每日记账系统",
+      "short_name": "记账系统",
+      "description": "一个简单易用的每日记账系统",
+      "id": "/",
+      "start_url": "./",
+      "scope": "./",
+      "display": "standalone",
+      "orientation": "portrait",
+      "background_color": "#F2F2F7",
+      "theme_color": "#007AFF",
+      "icons": [
+        {
+          "src": "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@develop/icons/applemusic.svg",
+          "sizes": "192x192",
+          "type": "image/svg+xml",
+          "purpose": "any"
+        },
+        {
+          "src": "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@develop/icons/applemusic.svg",
+          "sizes": "512x512",
+          "type": "image/svg+xml",
+          "purpose": "maskable"
+        }
+      ]
+    }
+    </script>
+
+    <style>
+        /* 全局样式 */
+        :root {
+            --primary-blue: #007AFF;
+            --primary-blue-dark: #0066CC;
+            --success-green: #34C759;
+            --error-red: #FF3B30;
+            --background-light: #F2F2F7;
+            --card-background: rgba(255, 255, 255, 0.8);
+            --border-radius: 16px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --safe-area-inset-top: env(safe-area-inset-top, 0px);
+            --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        @font-face {
+            font-family: 'SF Pro Display';
+            src: url('https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-regular-webfont.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'SF Pro Display';
+            src: url('https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-medium-webfont.woff2') format('woff2');
+            font-weight: 500;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'SF Pro Display';
+            src: url('https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-semibold-webfont.woff2') format('woff2');
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--background-light);
+            color: #000;
+            font-size: 16px;
+            line-height: 1.5;
+            padding-top: calc(20px + var(--safe-area-inset-top));
+            padding-bottom: calc(20px + var(--safe-area-inset-bottom));
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 500;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: var(--primary-blue);
+            color: white;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+            opacity: 0.9;
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border-radius: 50%;
+            font-size: 20px;
+        }
+
+        .btn-float {
+            position: fixed;
+            bottom: calc(24px + var(--safe-area-inset-bottom));
+            right: 24px;
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+            z-index: 100;
+        }
+
+        /* 卡片样式 */
+        .card {
+            background-color: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        /* 输入框样式 */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #000;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-size: 16px;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);
+        }
+
+        /* 加载动画 */
+        .loader {
+            width: 36px;
+            height: 36px;
+            border: 3px solid rgba(0, 122, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-blue);
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* 模态框样式 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: var(--card-background);
+            border-radius: var(--border-radius);
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        /* 头部样式 */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        /* 日期选择器 */
+        .date-picker {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--card-background);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .date-display {
+            font-size: 18px;
+            font-weight: 600;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        /* 概览卡片样式 */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .summary-card-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .summary-card-value {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* 记录列表样式 */
+        .record-list {
+            margin-bottom: 80px; /* 为浮动按钮留出空间 */
+        }
+
+        .record-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background-color: var(--card-background);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .record-info {
+            flex-grow: 1;
+        }
+
+        .record-type {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .record-time {
+            font-size: 12px;
+            color: #777;
+        }
+
+        .record-amount {
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .amount-income {
+            color: var(--success-green);
+        }
+
+        .amount-expense {
+            color: var(--error-red);
+        }
+
+        .record-delete {
+            margin-left: 12px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .record-delete:active {
+            background: rgba(0, 0, 0, 0.1);
+            transform: scale(0.95);
+        }
+
+        /* 记录类型选择器 */
+        .type-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .type-option {
+            flex: 1 0 calc(50% - 4px);
+            padding: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .type-option.active {
+            background-color: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        /* 辅助样式 */
+        .text-center {
+            text-align: center;
+        }
+
+        .mb-2 {
+            margin-bottom: 16px;
+        }
+
+        .mb-3 {
+            margin-bottom: 24px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* 导出按钮 */
+        .export-container {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .export-btn {
+            width: 100%;
+            text-align: center;
+            padding: 12px;
+            background-color: var(--card-background);
+            border-radius: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .export-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--card-background);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            z-index: 100;
+            display: none;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .export-dropdown.active {
+            display: block;
+        }
+
+        .export-option {
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .export-option:active {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* 日期范围选择器样式 */
+        .date-range-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .date-range-btn {
+            flex: 1 0 calc(33.333% - 6px);
+            padding: 8px 4px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .date-range-btn.active {
+            background-color: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        /* 日历样式 */
+        .calendar {
+            user-select: none;
+        }
+
+        .calendar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .calendar-month {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .calendar-nav-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .calendar-nav-btn:active {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 500;
+            color: #777;
+            padding: 8px 0;
+        }
+
+        .calendar-day {
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .calendar-day.active {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+
+        .calendar-day.other-month {
+            color: #ccc;
+        }
+
+        .calendar-day:hover:not(.active):not(.other-month) {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* 分页样式 */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 16px;
+            padding: 8px 0;
+        }
+
+        #page-info {
+            font-size: 14px;
+            color: #555;
+        }
+
+        /* 图表容器样式 */
+        canvas {
+            width: 100% !important;
+            max-height: 250px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 登录页面 -->
+        <div id="login-page">
+            <div class="card mb-3">
+                <h1 class="text-center mb-3" style="background: linear-gradient(135deg, #007AFF, #0066CC); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 600;">每日记账系统</h1>
+                <div class="form-group">
+                    <label for="email" class="input-label">邮箱</label>
+                    <input type="email" id="email" class="input-field" placeholder="请输入邮箱地址">
+                </div>
+                <div class="form-group">
+                    <label for="password" class="input-label">密码</label>
+                    <input type="password" id="password" class="input-field" placeholder="请输入密码">
+                </div>
+                <button id="login-btn" class="btn btn-gradient" style="width: 100%;">登录</button>
+                <div class="text-center" style="margin-top: 16px;">
+                    <a href="#" id="forgot-password" style="color: var(--primary-blue); text-decoration: none;">忘记密码？</a>
+                    <span style="margin: 0 8px; color: #999;">|</span>
+                    <a href="#" id="register-link" style="color: var(--primary-blue); text-decoration: none;">注册账号</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主页面 -->
+        <div id="main-page" class="hidden">
+            <!-- 头部 -->
+            <div class="header">
+                <button id="logout-btn" class="btn btn-icon" style="background-color: rgba(0,0,0,0.05); color: #555;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M16 17L21 12L16 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div class="header-title">每日记账</div>
+                <button id="details-btn" class="btn btn-icon" style="background-color: rgba(0,0,0,0.05); color: #555;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8 6H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M8 12H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M8 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M3 6H3.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M3 12H3.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M3 18H3.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- 日期选择器 -->
+            <div class="date-picker">
+                <button id="prev-day-btn" class="btn btn-icon" style="background-color: rgba(0,0,0,0.05); color: #555;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div id="current-date" class="date-display">2023年5月15日</div>
+                <button id="next-day-btn" class="btn btn-icon" style="background-color: rgba(0,0,0,0.05); color: #555;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <button id="calendar-btn" class="btn btn-icon" style="background-color: rgba(0,0,0,0.05); color: var(--primary-blue); margin-left: 8px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M16 2V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M8 2V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- 概览卡片 -->
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="summary-card-title">收入</div>
+                    <div class="summary-card-value" style="color: var(--success-green);" id="income-value">¥0.00</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-title">费用</div>
+                    <div class="summary-card-value" style="color: var(--error-red);" id="expense-value">¥0.00</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-title">利润</div>
+                    <div class="summary-card-value" id="profit-value">¥0.00</div>
+                </div>
+            </div>
+
+            <!-- 导出按钮 -->
+            <div class="export-container">
+                <div class="export-btn" id="export-btn">
+                    导出数据 
+                    <svg style="margin-left: 5px; vertical-align: middle;" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="export-dropdown" id="export-dropdown">
+                    <div class="export-option" id="export-csv">导出为 CSV</div>
+                    <div class="export-option" id="export-excel">导出为 Excel</div>
+                </div>
+            </div>
+
+            <!-- 记录列表 -->
+            <div class="record-list" id="record-list">
+                <!-- 记录项将由 JavaScript 动态添加 -->
+                <div class="text-center" style="padding: 20px; color: #777;" id="empty-records">
+                    今日暂无记录，点击加号添加
+                </div>
+            </div>
+
+            <!-- 添加记录按钮 -->
+            <button id="add-record-btn" class="btn btn-gradient btn-float">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 5V19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- 模态框 - 添加记录 -->
+    <div class="modal" id="add-record-modal">
+        <div class="modal-content">
+            <h2 class="mb-3" style="font-weight: 600;">添加记录</h2>
+            <div class="form-group">
+                <label for="record-amount" class="input-label">金额</label>
+                <input type="number" id="record-amount" class="input-field" placeholder="请输入金额" step="0.01">
+            </div>
+            <div class="form-group">
+                <label class="input-label">类型</label>
+                <div class="type-selector" id="type-income-selector">
+                    <div class="type-option" data-type="吃喝岭师">吃喝岭师</div>
+                    <div class="type-option" data-type="24个半">24个半</div>
+                    <div class="type-option" data-type="个人预约">个人预约</div>
+                </div>
+                <div class="type-selector hidden" id="type-expense-selector">
+                    <div class="type-option" data-type="食材">食材</div>
+                    <div class="type-option" data-type="交通">交通</div>
+                </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 24px;">
+                <label class="input-label">收入/费用</label>
+                <div style="display: flex; gap: 10px;">
+                    <button id="toggle-income" class="btn" style="flex: 1; background-color: var(--success-green);">收入</button>
+                    <button id="toggle-expense" class="btn" style="flex: 1; background-color: rgba(0,0,0,0.1); color: #555;">费用</button>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button id="cancel-add-record" class="btn" style="flex: 1; background-color: rgba(0,0,0,0.1); color: #555;">取消</button>
+                <button id="save-record" class="btn btn-gradient" style="flex: 1">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框 - 日历选择器 -->
+    <div class="modal" id="calendar-modal">
+        <div class="modal-content">
+            <h2 class="mb-3" style="font-weight: 600;">选择日期</h2>
+            <div id="calendar-container" class="mb-3">
+                <!-- 日历内容将由 JavaScript 动态生成 -->
+            </div>
+            <button id="close-calendar" class="btn" style="width: 100%; background-color: rgba(0,0,0,0.1); color: #555;">关闭</button>
+        </div>
+    </div>
+
+    <!-- 模态框 - 详细数据 -->
+    <div class="modal" id="details-modal">
+        <div class="modal-content" style="max-width: 90%; width: 600px;">
+            <h2 class="mb-3" style="font-weight: 600;">详细数据</h2>
+            
+            <!-- 日期范围选择 -->
+            <div class="card mb-3">
+                <h3 class="mb-2" style="font-size: 16px; font-weight: 600;">时间范围</h3>
+                <div class="date-range-options">
+                    <button class="date-range-btn active" data-range="7">最近7天</button>
+                    <button class="date-range-btn" data-range="30">最近30天</button>
+                    <button class="date-range-btn" data-range="90">最近90天</button>
+                    <button class="date-range-btn" data-range="month">本月</button>
+                    <button class="date-range-btn" data-range="lastMonth">上月</button>
+                    <button class="date-range-btn" data-range="year">今年</button>
+                    <button class="date-range-btn" data-range="custom">自定义</button>
+                </div>
+                <div class="custom-date-range hidden" id="custom-date-range">
+                    <div style="display: flex; gap: 10px; margin-top: 12px;">
+                        <div style="flex: 1;">
+                            <label class="input-label">开始日期</label>
+                            <input type="date" id="start-date" class="input-field">
+                        </div>
+                        <div style="flex: 1;">
+                            <label class="input-label">结束日期</label>
+                            <input type="date" id="end-date" class="input-field">
+                        </div>
+                    </div>
+                    <button id="apply-date-range" class="btn btn-gradient" style="width: 100%; margin-top: 12px;">应用</button>
+                </div>
+            </div>
+
+            <!-- 概览卡片 -->
+            <div class="summary-cards mb-3">
+                <div class="summary-card">
+                    <div class="summary-card-title">总收入</div>
+                    <div class="summary-card-value" style="color: var(--success-green);" id="total-income-value">¥0.00</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-title">总费用</div>
+                    <div class="summary-card-value" style="color: var(--error-red);" id="total-expense-value">¥0.00</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-title">总利润</div>
+                    <div class="summary-card-value" id="total-profit-value">¥0.00</div>
+                </div>
+            </div>
+
+            <!-- 图表区域 -->
+            <div class="card mb-3">
+                <h3 class="mb-2" style="font-size: 16px; font-weight: 600;">利润趋势</h3>
+                <canvas id="profit-chart" height="200"></canvas>
+            </div>
+
+            <div class="card mb-3">
+                <h3 class="mb-2" style="font-size: 16px; font-weight: 600;">收入趋势</h3>
+                <canvas id="income-chart" height="200"></canvas>
+            </div>
+
+            <div class="card mb-3">
+                <h3 class="mb-2" style="font-size: 16px; font-weight: 600;">费用趋势</h3>
+                <canvas id="expense-chart" height="200"></canvas>
+            </div>
+
+            <!-- 详细记录列表 -->
+            <div class="card mb-3">
+                <h3 class="mb-2" style="font-size: 16px; font-weight: 600;">记录列表</h3>
+                <div class="export-container" style="margin-bottom: 12px;">
+                    <div class="export-btn" id="export-range-btn">
+                        导出数据 
+                        <svg style="margin-left: 5px; vertical-align: middle;" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="export-dropdown" id="export-range-dropdown">
+                        <div class="export-option" id="export-range-csv">导出为 CSV</div>
+                        <div class="export-option" id="export-range-excel">导出为 Excel</div>
+                    </div>
+                </div>
+                <div id="range-record-list">
+                    <!-- 记录将由 JavaScript 动态添加 -->
+                </div>
+                <div class="text-center" style="padding: 20px; color: #777;" id="empty-range-records">
+                    所选时间范围内暂无记录
+                </div>
+                <!-- 分页控制 -->
+                <div class="pagination" id="pagination-controls">
+                    <button id="prev-page" class="btn" style="background-color: rgba(0,0,0,0.1); color: #555;">上一页</button>
+                    <span id="page-info">第 1 页</span>
+                    <button id="next-page" class="btn" style="background-color: rgba(0,0,0,0.1); color: #555;">下一页</button>
+                </div>
+            </div>
+
+            <button id="close-details" class="btn" style="width: 100%; background-color: rgba(0,0,0,0.1); color: #555; margin-top: 20px;">关闭</button>
+        </div>
+    </div>
+
+    <!-- 模态框 - 忘记密码 -->
+    <div class="modal" id="forgot-password-modal">
+        <div class="modal-content">
+            <h2 class="mb-3" style="font-weight: 600;">重置密码</h2>
+            <div class="form-group">
+                <label for="reset-email" class="input-label">邮箱</label>
+                <input type="email" id="reset-email" class="input-field" placeholder="请输入邮箱地址">
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button id="cancel-reset" class="btn" style="flex: 1; background-color: rgba(0,0,0,0.1); color: #555;">取消</button>
+                <button id="send-reset" class="btn btn-gradient" style="flex: 1">发送重置邮件</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框 - 注册 -->
+    <div class="modal" id="register-modal">
+        <div class="modal-content">
+            <h2 class="mb-3" style="font-weight: 600;">注册账号</h2>
+            <div class="form-group">
+                <label for="register-email" class="input-label">邮箱</label>
+                <input type="email" id="register-email" class="input-field" placeholder="请输入邮箱地址">
+            </div>
+            <div class="form-group">
+                <label for="register-password" class="input-label">密码</label>
+                <input type="password" id="register-password" class="input-field" placeholder="请输入密码">
+            </div>
+            <div class="form-group">
+                <label for="register-confirm-password" class="input-label">确认密码</label>
+                <input type="password" id="register-confirm-password" class="input-field" placeholder="请再次输入密码">
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button id="cancel-register" class="btn" style="flex: 1; background-color: rgba(0,0,0,0.1); color: #555;">取消</button>
+                <button id="submit-register" class="btn btn-gradient" style="flex: 1">注册</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框 - 加载中 -->
+    <div class="modal" id="loading-modal">
+        <div class="loader"></div>
+    </div>
+
+    <!-- 模态框 - 提示信息 -->
+    <div class="modal" id="alert-modal">
+        <div class="modal-content" style="max-width: 300px;">
+            <h3 class="text-center mb-3" id="alert-message">提示信息</h3>
+            <button id="alert-ok" class="btn btn-gradient" style="width: 100%;">确定</button>
+        </div>
+    </div>
+
+    <!-- 在底部加载JavaScript代码 -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
+
+    <script>
+        // 创建PWA图标链接（临时解决方案）
+        const iconLink = document.createElement('link');
+        iconLink.rel = 'icon';
+        iconLink.href = 'https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@develop/icons/applemusic.svg';
+        iconLink.type = 'image/svg+xml';
+        document.head.appendChild(iconLink);
+
+        const appleIconLink = document.createElement('link');
+        appleIconLink.rel = 'apple-touch-icon';
+        appleIconLink.href = 'https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@develop/icons/applemusic.svg';
+        document.head.appendChild(appleIconLink);
+
+        // PWA支持 - 创建manifest.json文件
+        const manifestData = document.getElementById('pwa-manifest').textContent;
+        const manifestBlob = new Blob([manifestData], {type: 'application/manifest+json'});
+        const manifestURL = URL.createObjectURL(manifestBlob);
+        
+        // 创建link元素并添加到head
+        const manifestLink = document.createElement('link');
+        manifestLink.rel = 'manifest';
+        manifestLink.href = manifestURL;
+        document.head.appendChild(manifestLink);
+        
+        // Service Worker注册
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async function() {
+                try {
+                    // Service Worker代码
+                    const swCode = `
+                        // 缓存名称
+                        const CACHE_NAME = 'daily-accounting-v2';
+                        
+                        // 需要缓存的文件
+                        const urlsToCache = [
+                            './',
+                            './index.html',
+                            'https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@develop/icons/applemusic.svg',
+                            'https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js',
+                            'https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js',
+                            'https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js',
+                            'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js',
+                            'https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js'
+                        ];
+                        
+                        // 安装Service Worker
+                        self.addEventListener('install', (event) => {
+                            console.log('Service Worker 安装中...');
+                            self.skipWaiting();
+                            event.waitUntil(
+                                caches.open(CACHE_NAME).then((cache) => {
+                                    console.log('打开缓存');
+                                    return cache.addAll(urlsToCache);
+                                })
+                            );
+                        });
+                        
+                        // 激活Service Worker
+                        self.addEventListener('activate', (event) => {
+                            console.log('Service Worker 激活中...');
+                            event.waitUntil(
+                                caches.keys().then((cacheNames) => {
+                                    return Promise.all(
+                                        cacheNames.filter((name) => {
+                                            return name !== CACHE_NAME;
+                                        }).map((name) => {
+                                            console.log('删除旧缓存:', name);
+                                            return caches.delete(name);
+                                        })
+                                    );
+                                }).then(() => {
+                                    console.log('Service Worker 现在控制所有客户端');
+                                    return self.clients.claim();
+                                })
+                            );
+                        });
+                        
+                        // 处理请求
+                        self.addEventListener('fetch', (event) => {
+                            // 确保在所有fetch事件中响应
+                            event.respondWith(
+                                caches.match(event.request).then((response) => {
+                                    // 如果找到缓存的响应，返回它
+                                    if (response) {
+                                        console.log('从缓存中提供:', event.request.url);
+                                        return response;
+                                    }
+                                    
+                                    // 否则从网络获取
+                                    console.log('从网络获取:', event.request.url);
+                                    return fetch(event.request).then((response) => {
+                                        // 检查响应是否有效
+                                        if (!response || response.status !== 200) {
+                                            return response;
+                                        }
+                                        
+                                        // 克隆响应
+                                        const responseToCache = response.clone();
+                                        
+                                        // 添加到缓存
+                                        caches.open(CACHE_NAME).then((cache) => {
+                                            cache.put(event.request, responseToCache);
+                                        });
+                                        
+                                        return response;
+                                    }).catch((error) => {
+                                        // 网络请求失败，返回默认离线页面
+                                        console.error('获取资源失败:', error);
+                                        return new Response('您当前处于离线状态，请稍后再试。');
+                                    });
+                                })
+                            );
+                        });
+                    `;
+                    
+                    // 创建Service Worker Blob
+                    const swBlob = new Blob([swCode], {type: 'text/javascript'});
+                    const swURL = URL.createObjectURL(swBlob);
+                    
+                    // 注册Service Worker
+                    const registration = await navigator.serviceWorker.register(swURL, {scope: './'});
+                    console.log('Service Worker已注册成功:', registration.scope);
+                } catch (error) {
+                    console.error('Service Worker注册失败:', error);
+                }
+            });
+        }
+        
+        // 应用初始化代码
+        document.addEventListener('DOMContentLoaded', () => {
+            // ... 现有的应用初始化代码 ...
+        });
+    </script>
+</body>
+</html> 
